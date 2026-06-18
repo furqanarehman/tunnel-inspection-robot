@@ -204,11 +204,13 @@
       <always_on>true</always_on>
       <update_rate>100</update_rate>
       <plugin name="imu_plugin" filename="libgazebo_ros_imu_sensor.so">
-        <topicName>imu/data</topicName>
-        <bodyName>imu_link</bodyName>
-        <updateRateHZ>100</updateRateHZ>
-        <gaussianNoise>0.01</gaussianNoise>
-        <frameName>imu_link</frameName>
+        <ros>
+          <remapping>~/out:=imu/data</remapping>
+        </ros>
+        <initial_orientation_as_reference>false</initial_orientation_as_reference>
+        <frame_name>imu_link</frame_name>
+        <update_rate>100</update_rate>
+        <gaussian_noise>0.01</gaussian_noise>
       </plugin>
     </sensor>
   </gazebo>
