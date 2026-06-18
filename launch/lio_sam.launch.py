@@ -17,7 +17,8 @@ def generate_launch_description():
         ExecuteProcess(
             cmd=['gazebo', '--verbose',
                  '-s', 'libgazebo_ros_init.so',
-                 '-s', 'libgazebo_ros_factory.so'],
+                 '-s', 'libgazebo_ros_factory.so',
+                 os.path.join(pkg, 'worlds', 'tunnel.world')],
             output='screen'
         ),
 
@@ -35,7 +36,11 @@ def generate_launch_description():
         Node(
             package='gazebo_ros',
             executable='spawn_entity.py',
-            arguments=['-topic', 'robot_description', '-entity', 'tunnel_robot'],
+            arguments=['-topic', 'robot_description', 
+                       '-entity', 'tunnel_robot',
+                       '-x', '5.0',
+                       '-y', '0.0',
+                       '-z', '0.2'],
             output='screen'
         ),
 

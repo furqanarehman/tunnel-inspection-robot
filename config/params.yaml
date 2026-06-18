@@ -35,10 +35,10 @@
 
     imuGravity: 9.80511
     imuRPYWeight: 0.01
-    imuAccNoise: 0.1
-    imuGyrNoise: 0.1
-    imuAccBiasN: 0.01
-    imuGyrBiasN: 0.01
+    imuAccNoise: 1.0
+    imuGyrNoise: 0.5
+    imuAccBiasN: 0.1
+    imuGyrBiasN: 0.1
 
     # Extrinsic calibration: LiDAR is 0.1m forward and 0.05m above IMU
     extrinsicTrans:  [ 0.1,  0.0,  0.05 ]
