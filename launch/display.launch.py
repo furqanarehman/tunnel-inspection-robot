@@ -1,12 +1,14 @@
 import os
-from ament_python import LaunchDescription
+from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.actions import ExecuteProcess
 from ament_index_python.packages import get_package_share_directory
+import xacro
 
 def generate_launch_description():
     pkg = get_package_share_directory('tunnel_inspection_robot')
     urdf_file = os.path.join(pkg, 'urdf', 'tunnel_robot.urdf.xacro')
+    robot_description = xacro.process_file(urdf_file).toxml()
 
     return LaunchDescription([
         # Start Gazebo
@@ -21,7 +23,7 @@ def generate_launch_description():
             executable='robot_state_publisher',
             name='robot_state_publisher',
             output='screen',
-            parameters=[{'robot_description': open(urdf_file).read()}]
+            parameters=[{'robot_description': robot_description}]
         ),
 
         # Spawn robot in Gazebo
