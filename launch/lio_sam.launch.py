@@ -1,8 +1,7 @@
-
 import os
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import ExecuteProcess
+from launch.actions import ExecuteProcess, TimerAction
 from ament_index_python.packages import get_package_share_directory
 import xacro
 
@@ -14,9 +13,11 @@ def generate_launch_description():
 
     return LaunchDescription([
 
-        # Start Gazebo
+        # Start Gazebo with clock publisher
         ExecuteProcess(
-            cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_factory.so'],
+            cmd=['gazebo', '--verbose',
+                 '-s', 'libgazebo_ros_init.so',
+                 '-s', 'libgazebo_ros_factory.so'],
             output='screen'
         ),
 
@@ -26,7 +27,8 @@ def generate_launch_description():
             executable='robot_state_publisher',
             name='robot_state_publisher',
             output='screen',
-            parameters=[{'robot_description': robot_description}]
+            parameters=[{'robot_description': robot_description,
+                         'use_sim_time': True}]
         ),
 
         # Spawn robot in Gazebo
@@ -37,44 +39,46 @@ def generate_launch_description():
             output='screen'
         ),
 
-        # LIO-SAM nodes
-        Node(
-            package='lio_sam',
-            executable='lio_sam_imuPreintegration',
-            name='lio_sam_imuPreintegration',
-            parameters=[params_file],
-            output='screen'
-        ),
-
-        Node(
-            package='lio_sam',
-            executable='lio_sam_imageProjection',
-            name='lio_sam_imageProjection',
-            parameters=[params_file],
-            output='screen'
-        ),
-
-        Node(
-            package='lio_sam',
-            executable='lio_sam_featureExtraction',
-            name='lio_sam_featureExtraction',
-            parameters=[params_file],
-            output='screen'
-        ),
-
-        Node(
-            package='lio_sam',
-            executable='lio_sam_mapOptimization',
-            name='lio_sam_mapOptimization',
-            parameters=[params_file],
-            output='screen'
-        ),
-
-        # RViz for visualization
+        # RViz
         Node(
             package='rviz2',
             executable='rviz2',
             name='rviz2',
+            arguments=['-d', os.path.join(
+                get_package_share_directory('lio_sam'),
+                'config', 'rviz2.rviz')],
             output='screen'
         ),
+
+        # LIO-SAM nodes delayed by 5 seconds
+        TimerAction(period=5.0, actions=[
+            Node(
+                package='lio_sam',
+                executable='lio_sam_imuPreintegration',
+                name='lio_sam_imuPreintegration',
+                parameters=[params_file, {'use_sim_time': True}],
+                output='screen'
+            ),
+            Node(
+                package='lio_sam',
+                executable='lio_sam_imageProjection',
+                name='lio_sam_imageProjection',
+                parameters=[params_file, {'use_sim_time': True}],
+                output='screen'
+            ),
+            Node(
+                package='lio_sam',
+                executable='lio_sam_featureExtraction',
+                name='lio_sam_featureExtraction',
+                parameters=[params_file, {'use_sim_time': True}],
+                output='screen'
+            ),
+            Node(
+                package='lio_sam',
+                executable='lio_sam_mapOptimization',
+                name='lio_sam_mapOptimization',
+                parameters=[params_file, {'use_sim_time': True}],
+                output='screen'
+            ),
+        ]),
     ])
